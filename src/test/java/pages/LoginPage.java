@@ -3,13 +3,10 @@ package pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class LoginPage {
+public class LoginPage extends BasePage {
 
-    WebDriver driver;
-
-    // Constructor
     public LoginPage(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 
     // Locators
@@ -21,15 +18,15 @@ public class LoginPage {
 
     // Actions
     public void enterUsername(String username) {
-        driver.findElement(usernameInput).sendKeys(username);
+        enterText(usernameInput, username);
     }
 
     public void enterPassword(String password) {
-        driver.findElement(passwordInput).sendKeys(password);
+        enterText(passwordInput, password);
     }
 
     public void clickLoginButton() {
-        driver.findElement(loginButton).click();
+        clickElement(loginButton);
     }
 
     public void login(String username, String password) {
