@@ -16,6 +16,8 @@ public class LoginPage extends BasePage {
 
     By loginButton = By.xpath("//button[@type='submit']");
 
+    private By dashboardHeader = By.xpath("//h6[text()='Dashboard']");
+
     // Actions
     public void enterUsername(String username) {
         enterText(usernameInput, username);
@@ -36,5 +38,9 @@ public class LoginPage extends BasePage {
         enterPassword(password);
 
         clickLoginButton();
+    }
+
+    public String getDashboardHeader() {
+        return getText(dashboardHeader);
     }
 }

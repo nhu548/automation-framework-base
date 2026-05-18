@@ -40,4 +40,10 @@ public class BasePage {
     public void waitForElementVisible(By locator) {
         wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
+
+    public String getText(By locator) {
+        waitForElementVisible(locator);
+        return driver.findElement(locator).getText();
+    }
+
 }

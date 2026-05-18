@@ -3,6 +3,7 @@ package tests;
 import base.BaseTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import pages.LoginPage;
 
 public class LoginTest extends BaseTest {
 
@@ -22,15 +23,16 @@ public class LoginTest extends BaseTest {
 
         String password = "admin123";
 
-        pages.LoginPage loginPage = new pages.LoginPage(driver);
+        LoginPage loginPage = new LoginPage(driver);
 
         loginPage.login(username, password);
 
         // Verify that we are logged in by checking the presence of the dashboard header
 
-        String dashboardHeader = driver.findElement(org.openqa.selenium.By.xpath("//h6[text()='Dashboard']")).getText();
-
-        Assert.assertEquals(dashboardHeader, "Dashboard");
+        Assert.assertEquals(
+                loginPage.getDashboardHeader(),
+                "Dashboard"
+        );
     }
 
 }
