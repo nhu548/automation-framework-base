@@ -20,6 +20,9 @@ public class LoginTest extends BaseTest {
 
     @Test
     public void verifyLoginWithValidCredentials() {
+
+        test = extent.createTest("Verify Login With Valid Credentials");
+
         String username = ConfigReader.getProperty("username");
 
         String password = ConfigReader.getProperty("password");
