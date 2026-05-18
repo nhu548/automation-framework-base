@@ -4,6 +4,8 @@ import base.BaseTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.LoginPage;
+import utils.ConfigReader;
+
 
 public class LoginTest extends BaseTest {
 
@@ -18,10 +20,9 @@ public class LoginTest extends BaseTest {
 
     @Test
     public void verifyLoginWithValidCredentials() {
+        String username = ConfigReader.getProperty("username");
 
-        String username = "Admin";
-
-        String password = "admin123";
+        String password = ConfigReader.getProperty("password");
 
         LoginPage loginPage = new LoginPage(driver);
 

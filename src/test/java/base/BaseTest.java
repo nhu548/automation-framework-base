@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import utils.ConfigReader;
 
 import java.time.Duration;
 
@@ -23,7 +24,7 @@ public class BaseTest {
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
-        driver.get("https://opensource-demo.orangehrmlive.com/");
+        driver.get(ConfigReader.getProperty("baseUrl"));
     }
 
     @AfterMethod
