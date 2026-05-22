@@ -9,38 +9,26 @@ public class LoginPage extends BasePage {
         super(driver);
     }
 
-    // Locators
-    By usernameInput = By.name("username");
+    private By usernameInput = By.name("username");
+    private By passwordInput = By.name("password");
+    private By loginButton = By.xpath("//input[@type='submit']");
+    By errorMessage = By.cssSelector(".error");
 
-    By passwordInput = By.name("password");
-
-    By loginButton = By.xpath("//button[@type='submit']");
-
-    private By dashboardHeader = By.xpath("//h6[text()='Dashboard']");
-
-    // Actions
-    public void enterUsername(String username) {
+    public DashboardPage login(String username, String password) {
         enterText(usernameInput, username);
-    }
-
-    public void enterPassword(String password) {
         enterText(passwordInput, password);
-    }
-
-    public void clickLoginButton() {
         clickElement(loginButton);
+
+        return new DashboardPage(driver);
     }
 
-    public void login(String username, String password) {
+    public String getLoginErrorMessage() {
 
-        enterUsername(username);
-
-        enterPassword(password);
-
-        clickLoginButton();
+        return driver.findElement(errorMessage).getText();
     }
 
-    public String getDashboardHeader() {
-        return getText(dashboardHeader);
+    public boolean isLoginPageDisplayed() {
+
+        return driver.findElement(loginButton).isDisplayed();
     }
 }

@@ -18,7 +18,6 @@ import java.time.Duration;
 public class BaseTest {
 
     protected WebDriver driver;
-
     protected ExtentReports extent;
     protected ExtentTest test;
 
@@ -31,13 +30,14 @@ public class BaseTest {
 
         WebDriverManager.chromedriver().setup();
 
+        //Init driver
         driver = new ChromeDriver();
-
         driver.manage().window().maximize();
 
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-
+        //Open application
         driver.get(ConfigReader.getProperty("baseUrl"));
+
+        test.info("Browser launched and URL opened");
     }
 
     @AfterMethod

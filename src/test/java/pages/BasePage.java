@@ -9,41 +9,63 @@ import java.time.Duration;
 
 public class BasePage {
 
-    WebDriver driver;
-    WebDriverWait wait;
+    protected WebDriver driver;
+
+    protected WebDriverWait wait;
 
     public BasePage(WebDriver driver) {
+
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        wait = new WebDriverWait(
+                driver,
+                Duration.ofSeconds(10)
+        );
     }
 
-    // Common Methods
-
-    public void enterText(By locator, String text) {
-        waitForElementVisible(locator);
-        driver.findElement(locator).sendKeys(text);
-    }
+    // =========================
+    // COMMON METHODS
+    // =========================
 
     public void clickElement(By locator) {
-        waitForElementVisible(locator);
+
+        waitForVisibility(locator);
+
         driver.findElement(locator).click();
     }
 
-    public String getPageTitle() {
-        return driver.getTitle();
-    }
+    public void enterText(By locator, String text) {
 
-    public String getCurrentUrl() {
-        return driver.getCurrentUrl();
-    }
+        waitForVisibility(locator);
 
-    public void waitForElementVisible(By locator) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+        driver.findElement(locator).clear();
+
+        driver.findElement(locator).sendKeys(text);
     }
 
     public String getText(By locator) {
-        waitForElementVisible(locator);
+
+        waitForVisibility(locator);
+
         return driver.findElement(locator).getText();
     }
 
+    public boolean isDisplayed(By locator) {
+
+        waitForVisibility(locator);
+
+        return driver.findElement(locator).isDisplayed();
+    }
+
+    // =========================
+    // WAIT METHODS
+    // =========================
+
+    public void waitForVisibility(By locator) {
+
+        wait.until(
+                ExpectedConditions
+                        .visibilityOfElementLocated(locator)
+        );
+    }
 }

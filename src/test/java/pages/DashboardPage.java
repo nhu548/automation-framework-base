@@ -5,19 +5,34 @@ import org.openqa.selenium.WebDriver;
 
 public class DashboardPage extends BasePage {
 
-    WebDriver driver;
+    private By dashboardHeader = By.xpath("//h1[contains(text(),'Accounts Overview')]");
+
+    private By transferFundsLink = By.linkText("Transfer Funds");
+
+    private By logoutButton =
+            By.xpath("//a[text()='Log Out']");
+
     public DashboardPage(WebDriver driver) {
         super(driver);
-        this.driver = driver;
     }
 
-    // Locators
-
-    By dashboardHeader = By.xpath("//h6[text()='Dashboard']");
-
-    // Methods
-
     public String getDashboardHeader() {
-        return driver.findElement(dashboardHeader).getText();
+        return getText(dashboardHeader);
+    }
+
+    public boolean isDashboardDisplayed() {
+        return driver.findElement(dashboardHeader).isDisplayed();
+    }
+
+    public TransferPage navigateToTransferFunds() {
+        clickElement(transferFundsLink);
+        return new TransferPage(driver);
+    }
+
+    public LoginPage logout() {
+
+        driver.findElement(logoutButton).click();
+
+        return new LoginPage(driver);
     }
 }
