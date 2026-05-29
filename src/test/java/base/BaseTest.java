@@ -13,8 +13,6 @@ import utils.ExtentManager;
 import utils.ScreenshotUtil;
 import java.lang.reflect.Method;
 
-import java.time.Duration;
-
 public class BaseTest {
 
     protected WebDriver driver;

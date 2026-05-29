@@ -2,7 +2,9 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -23,49 +25,103 @@ public class BasePage {
         );
     }
 
-    // =========================
-    // COMMON METHODS
-    // =========================
+    // =========================================================
+    // ELEMENT METHODS
+    // =========================================================
+
+    public WebElement getElement(By locator) {
+
+        waitForElementVisible(locator);
+
+        return driver.findElement(locator);
+    }
 
     public void clickElement(By locator) {
 
-        waitForVisibility(locator);
-
-        driver.findElement(locator).click();
+        getElement(locator).click();
     }
 
     public void enterText(By locator, String text) {
 
-        waitForVisibility(locator);
+        waitForElementVisible(locator);
 
-        driver.findElement(locator).clear();
+        WebElement element =
+                driver.findElement(locator);
 
-        driver.findElement(locator).sendKeys(text);
+        element.clear();
+
+        element.sendKeys(text);
     }
 
     public String getText(By locator) {
 
-        waitForVisibility(locator);
-
-        return driver.findElement(locator).getText();
+        return getElement(locator).getText();
     }
 
-    public boolean isDisplayed(By locator) {
+    // =========================================================
+    // VALIDATION METHODS
+    // =========================================================
 
-        waitForVisibility(locator);
+    public boolean isElementDisplayed(By locator) {
 
-        return driver.findElement(locator).isDisplayed();
+        try {
+
+            waitForElementVisible(locator);
+
+            return true;
+
+        } catch (Exception e) {
+
+            return false;
+        }
     }
 
-    // =========================
+    // =========================================================
+    // DROPDOWN METHODS
+    // =========================================================
+
+    public void selectFromDropdown(By locator, String value) {
+
+        waitForDropdownOptions(locator);
+
+        Select select =
+                new Select(getElement(locator));
+        System.out.println("========== DROPDOWN OPTIONS ==========");
+        System.out.println(
+                "Options count: "
+                        + select.getOptions().size()
+        );
+        for (WebElement option : select.getOptions()) {
+
+            System.out.println(
+                    "TEXT: " + option.getText()
+                            + " | VALUE: " + option.getAttribute("value")
+            );
+        }
+        select.selectByValue(value);
+
+    }
+
+    // =========================================================
     // WAIT METHODS
-    // =========================
+    // =========================================================
 
-    public void waitForVisibility(By locator) {
+    public void waitForElementVisible(By locator) {
 
         wait.until(
                 ExpectedConditions
                         .visibilityOfElementLocated(locator)
         );
+    }
+
+    public void waitForDropdownOptions(By locator) {
+
+        wait.until(driver -> {
+
+            Select select =
+                    new Select(driver.findElement(locator));
+
+            return select.getOptions().size() > 0;
+        });
     }
 }
