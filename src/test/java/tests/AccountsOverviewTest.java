@@ -84,26 +84,25 @@ public class AccountsOverviewTest extends BaseAuthenticatedTest {
         test.pass("Account details page opened successfully");
     }
 
-// =========================================================
-// TC04 - Verify account balance displayed
-// =========================================================
+    // =========================================================
+    // TC04 -  Verify Customer Account Information Displayed
+    // =========================================================
 
-    @Test(description = "Verify account balance displayed")
-    public void verifyAccountBalanceDisplayed() {
+    @Test(description = "Verify customer account information displayed")
+    public void verifyCustomerAccountInformationDisplayed() {
 
-        test.info("STEP 1 - Get account balance");
+        test.info("STEP 1 - Get first account balance");
 
         String balance =
                 accountsOverviewPage.getFirstAccountBalance();
 
-        test.info("STEP 2 - Verify balance is displayed");
+        test.info("STEP 2 - Verify balance format");
 
-        Assert.assertFalse(
-                balance.isEmpty(),
-                "Account balance should be displayed"
+        Assert.assertTrue(
+                balance.matches("\\$\\d+\\.\\d{2}"),
+                "Balance format is invalid"
         );
 
-        test.pass("Account balance displayed successfully");
+        test.pass("Account information displayed successfully");
     }
-    
 }
