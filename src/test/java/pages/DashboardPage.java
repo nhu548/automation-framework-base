@@ -5,12 +5,19 @@ import org.openqa.selenium.WebDriver;
 
 public class DashboardPage extends BasePage {
 
+    // =========================================================
+    // LOCATORS
+    // =========================================================
+
     private By dashboardHeader = By.xpath("//h1[contains(text(),'Accounts Overview')]");
 
     private By transferFundsLink = By.linkText("Transfer Funds");
 
     private By logoutButton =
             By.xpath("//a[text()='Log Out']");
+
+    private By accountsOverviewLink =
+            By.linkText("Accounts Overview");
 
     public DashboardPage(WebDriver driver) {
         super(driver);
@@ -35,4 +42,16 @@ public class DashboardPage extends BasePage {
 
         return new LoginPage(driver);
     }
+
+    // =========================================================
+    // BUSINESS METHODS
+    // =========================================================
+
+    public AccountsOverviewPage navigateToAccountsOverview() {
+
+        clickElement(accountsOverviewLink);
+
+        return new AccountsOverviewPage(driver);
+    }
+
 }
