@@ -8,52 +8,29 @@ public class AccountsOverviewPage extends BasePage {
     // =========================================================
     // LOCATORS
     // =========================================================
-
-    private By accountsTable =
-            By.id("accountTable");
+    private By accountsTable = By.id("accountTable");
 
     private By accountRows =
             By.xpath("//table[@id='accountTable']/tbody/tr");
 
-    private By firstAccountLink =
+    private final By firstAccountLink =
             By.xpath("//table[@id='accountTable']/tbody/tr[1]/td[1]/a");
 
-    private By firstAccountNumber =
-            By.xpath("//table//tbody/tr[1]/td[1]/a");
-
-    private By firstAccountBalance =
-            By.xpath("//table//tbody/tr[1]/td[2]");
+    private final By firstAccountBalance =
+            By.xpath("//table[@id='accountTable']/tbody/tr[1]/td[2]");
 
     // =========================================================
     // CONSTRUCTOR
     // =========================================================
 
     public AccountsOverviewPage(WebDriver driver) {
-
         super(driver);
     }
-
     // =========================================================
-    // BUSINESS METHODS
+    // ACTIONS / STATE CHECKS
     // =========================================================
-
     public boolean isAccountsTableDisplayed() {
-
         return isElementDisplayed(accountsTable);
-    }
-
-    public int getAccountsCount() {
-
-        waitForAccountsLoaded();
-
-        return driver.findElements(accountRows).size();
-    }
-
-    public AccountDetailsPage clickFirstAccount() {
-
-        clickElement(firstAccountLink);
-
-        return new AccountDetailsPage(driver);
     }
 
     public void waitForAccountsLoaded() {
@@ -64,14 +41,27 @@ public class AccountsOverviewPage extends BasePage {
         );
     }
 
-    public String getFirstAccountNumber() {
-
-        return getText(firstAccountNumber);
+    public int getAccountsCount() {
+        waitForAccountsLoaded();
+        return driver.findElements(accountRows).size();
     }
 
-    // Generate Selenium Page Object method to get first account balance
-    public String getFirstAccountBalance() {
+    // =========================================================
+    // FIRST ROW DATA (COMMON BUSINESS CASE)
+    // =========================================================
 
+    public String getFirstAccountNumber() {
+        return getText(firstAccountLink);
+    }
+
+    public String getFirstAccountBalance() {
         return getText(firstAccountBalance);
     }
+
+    public AccountDetailsPage clickFirstAccount() {
+        clickElement(firstAccountLink);
+        return new AccountDetailsPage(driver);
+    }
+
+
 }

@@ -7,10 +7,10 @@ public class TransferTestData {
     // =========================================================
 
     public static final String FROM_ACCOUNT =
-            "26220";
+            "18339";
 
     public static final String TO_ACCOUNT =
-            "26442";
+            "18672";
 
     public static final String VALID_TRANSFER_AMOUNT =
             "50";
