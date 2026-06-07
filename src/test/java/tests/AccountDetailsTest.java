@@ -61,10 +61,6 @@ public class AccountDetailsTest extends BaseAuthenticatedTest {
         int transactionCount =
                 accountDetailsPage.getTransactionCount();
 
-        System.out.println(
-                "Transaction Count = " + transactionCount
-        );
-
         test.info("STEP 2 - Verify transactions exist");
 
         Assert.assertTrue(
@@ -128,5 +124,52 @@ public class AccountDetailsTest extends BaseAuthenticatedTest {
         }
 
         test.pass("Transaction amount format verified successfully");
+    }
+
+    // =========================================================
+    // TC05 - Verify transaction description displayed
+    // =========================================================
+
+    @Test(description = "Verify transaction description displayed")
+    public void verifyTransactionDescriptionDisplayed() {
+
+        test.info("STEP 1 - Get transaction descriptions");
+
+        List<String> transactionDescriptions =
+                accountDetailsPage.getTransactionDescriptions();
+
+        test.info("STEP 2 - Verify transaction descriptions exist");
+        for (String description : transactionDescriptions) {
+
+            Assert.assertTrue(
+                    description.contains("Transfer"),
+                    "Invalid transaction description: " + description
+            );
+        }
+
+        Assert.assertFalse(
+                transactionDescriptions.isEmpty(),
+                "Transaction descriptions should not be empty"
+        );
+
+        test.info("STEP 3 - Verify each description is displayed");
+
+        for (String description : transactionDescriptions) {
+
+            Assert.assertFalse(
+                    description.trim().isEmpty(),
+                    "Transaction description should not be empty"
+            );
+        }
+
+        for (String description : transactionDescriptions) {
+
+            Assert.assertTrue(
+                    description.contains("Transfer"),
+                    "Invalid transaction description: " + description
+            );
+        }
+
+        test.pass("Transaction descriptions verified successfully");
     }
 }

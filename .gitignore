@@ -17,3 +17,9 @@ Thumbs.db
 *.msi
 *.zip
 *.rar
+
+# TestNG reports
+test-output/
+
+# Screenshots
+screenshots/

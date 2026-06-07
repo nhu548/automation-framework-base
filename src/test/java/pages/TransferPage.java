@@ -45,9 +45,6 @@ public class TransferPage extends BasePage {
     }
 
     private void selectDestinationAccount(String toAccount) {
-        System.out.println(
-                driver.findElements(fromAccountDropdown).size()
-        );
         selectFromDropdown(
                 toAccountDropdown,
                 toAccount

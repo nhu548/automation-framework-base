@@ -86,18 +86,6 @@ public class BasePage {
 
         Select select =
                 new Select(getElement(locator));
-        System.out.println("========== DROPDOWN OPTIONS ==========");
-        System.out.println(
-                "Options count: "
-                        + select.getOptions().size()
-        );
-        for (WebElement option : select.getOptions()) {
-
-            System.out.println(
-                    "TEXT: " + option.getText()
-                            + " | VALUE: " + option.getAttribute("value")
-            );
-        }
         select.selectByValue(value);
 
     }

@@ -27,6 +27,9 @@ public class AccountDetailsPage extends BasePage {
     private final By descriptionCells =
             By.xpath("//table[@id='transactionTable']/tbody/tr/td[2]");
 
+    private By transactionDescriptions =
+            By.xpath("//table[@id='transactionTable']//tbody/tr/td[2]");
+
     private final By amountCells =
             By.xpath("//table[@id='transactionTable']/tbody/tr/td[3]");
 
@@ -48,6 +51,7 @@ public class AccountDetailsPage extends BasePage {
     }
 
     public int  getTransactionCount() {
+        waitForElementVisible(transactionRows);
         return driver.findElements(transactionRows).size();
     }
 
@@ -79,8 +83,10 @@ public class AccountDetailsPage extends BasePage {
     }
 
     public List<String> getTransactionAmounts() {
+        waitForElementVisible(amountCells);
         return extractColumnTexts(amountCells);
     }
+
 
     private List<String> extractColumnTexts(By locator) {
         List<String> values = new ArrayList<>();
@@ -91,6 +97,19 @@ public class AccountDetailsPage extends BasePage {
         }
         return values;
     }
+
+    public List<String> getTransactionDescriptions() {
+
+        wait.until(driver ->
+                driver.findElements(transactionDescriptions).size() > 0
+        );
+
+        return driver.findElements(transactionDescriptions)
+                .stream()
+                .map(e -> e.getText().trim())
+                .toList();
+    }
+
 
     // =========================================================
     // VALIDATIONS

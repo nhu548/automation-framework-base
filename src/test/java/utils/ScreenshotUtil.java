@@ -4,6 +4,8 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +13,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ScreenshotUtil {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(ScreenshotUtil.class);
+
+    private static final String SCREENSHOT_FOLDER =
+            "screenshots/";
 
     public static void captureScreenshot(WebDriver driver, String testName) {
 
@@ -22,20 +30,31 @@ public class ScreenshotUtil {
                 new SimpleDateFormat("yyyyMMdd_HHmmss")
                         .format(new Date());
 
-        String path =
-                "screenshots/" + testName + "_" + timestamp + ".png";
+        String screenshotPath =
+                SCREENSHOT_FOLDER
+                        + testName
+                        + "_"
+                        + timestamp
+                        + ".png";
 
-        File destination = new File(path);
+        File destination = new File(screenshotPath);
 
         try {
 
             FileUtils.copyFile(source, destination);
 
-            System.out.println("Screenshot saved: " + path);
+            logger.info(
+                    "Screenshot saved successfully: {}",
+                    screenshotPath
+            );
 
         } catch (IOException e) {
 
-            e.printStackTrace();
+            logger.error(
+                    "Failed to save screenshot: {}",
+                    screenshotPath,
+                    e
+            );
         }
     }
 }
