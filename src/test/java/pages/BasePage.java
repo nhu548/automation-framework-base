@@ -90,6 +90,17 @@ public class BasePage {
 
     }
 
+    public void selectByVisibleText(
+            By locator,
+            String visibleText
+    ) {
+
+        Select select =
+                new Select(driver.findElement(locator));
+
+        select.selectByVisibleText(visibleText);
+    }
+
     // =========================================================
     // WAIT METHODS
     // =========================================================

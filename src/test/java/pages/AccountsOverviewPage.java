@@ -3,6 +3,8 @@ package pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
+import java.util.List;
+
 public class AccountsOverviewPage extends BasePage {
 
     // =========================================================
@@ -19,6 +21,9 @@ public class AccountsOverviewPage extends BasePage {
     private final By firstAccountBalance =
             By.xpath("//table[@id='accountTable']/tbody/tr[1]/td[2]");
 
+    private By accountNumbers =
+            By.xpath("//table[@id='accountTable']//tbody/tr/td[1]/a");
+
     // =========================================================
     // CONSTRUCTOR
     // =========================================================
@@ -27,7 +32,7 @@ public class AccountsOverviewPage extends BasePage {
         super(driver);
     }
     // =========================================================
-    // ACTIONS / STATE CHECKS
+    // PRIVATE HELPER METHODS
     // =========================================================
     public boolean isAccountsTableDisplayed() {
         return isElementDisplayed(accountsTable);
@@ -47,7 +52,7 @@ public class AccountsOverviewPage extends BasePage {
     }
 
     // =========================================================
-    // FIRST ROW DATA (COMMON BUSINESS CASE)
+    // BUSINESS METHODS
     // =========================================================
 
     public String getFirstAccountNumber() {
@@ -61,6 +66,17 @@ public class AccountsOverviewPage extends BasePage {
     public AccountDetailsPage clickFirstAccount() {
         clickElement(firstAccountLink);
         return new AccountDetailsPage(driver);
+    }
+
+
+    public List<String> getAccountNumbers() {
+
+        waitForElementVisible(accountNumbers);
+
+        return driver.findElements(accountNumbers)
+                .stream()
+                .map(element -> element.getText().trim())
+                .toList();
     }
 
 

@@ -19,6 +19,9 @@ public class DashboardPage extends BasePage {
     private By accountsOverviewLink =
             By.linkText("Accounts Overview");
 
+    private By openNewAccountLink =
+            By.linkText("Open New Account");
+
     public DashboardPage(WebDriver driver) {
         super(driver);
     }
@@ -52,6 +55,13 @@ public class DashboardPage extends BasePage {
         clickElement(accountsOverviewLink);
 
         return new AccountsOverviewPage(driver);
+    }
+
+    public OpenNewAccountPage navigateToOpenNewAccount() {
+
+        clickElement(openNewAccountLink);
+
+        return new OpenNewAccountPage(driver);
     }
 
 }
