@@ -68,6 +68,41 @@ public class AccountsOverviewPage extends BasePage {
         return new AccountDetailsPage(driver);
     }
 
+    public AccountDetailsPage clickAccount() {
+        clickElement(firstAccountLink);
+        return new AccountDetailsPage(driver);
+    }
+
+    private By getAccountBalanceLocator(String accountNumber) {
+
+        return By.xpath(
+                "//a[text()='" + accountNumber + "']" +
+                        "/parent::td/following-sibling::td[1]"
+        );
+    }
+
+    private By getAccountLinkLocator(String accountNumber) {
+
+        return By.linkText(accountNumber);
+    }
+
+    public double getAccountBalance(String accountNumber) {
+
+        String balanceText =
+                getText(getAccountBalanceLocator(accountNumber))
+                        .replace("$", "")
+                        .replace(",", "")
+                        .trim();
+
+        return Double.parseDouble(balanceText);
+    }
+
+    public AccountDetailsPage clickAccountByNumber(String accountNumber) {
+
+        clickElement(getAccountLinkLocator(accountNumber));
+
+        return new AccountDetailsPage(driver);
+    }
 
     public List<String> getAccountNumbers() {
 

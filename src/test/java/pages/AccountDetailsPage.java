@@ -129,4 +129,23 @@ public class AccountDetailsPage extends BasePage {
     public boolean isValidAmountFormat(String amount) {
         return amount != null && amount.matches("\\$\\d+\\.\\d{2}");
     }
+
+    public boolean isTransactionDisplayed(
+            String expectedDescription,
+            String expectedAmount
+    ) {
+
+        waitForElementVisible(transactionRows);
+
+        return driver.findElements(transactionRows)
+                .stream()
+                .anyMatch(row ->
+
+                        row.getText().contains(expectedDescription)
+
+                                &&
+
+                                row.getText().contains(expectedAmount)
+                );
+    }
 }

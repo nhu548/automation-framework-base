@@ -64,7 +64,7 @@ public class OpenNewAccountPage extends BasePage {
 
     }
 
-    public OpenNewAccountPage openNewAccount(String accountType,String fromAccount){
+    public OpenNewAccountPage openNewAccount(String accountType, String fromAccount){
 
         selectAccountType(accountType);
         selectFromAccount(fromAccount);

@@ -15,6 +15,14 @@
 
             <class name="tests.TransferFundsTest"/>
 
+            <class name="tests.TransferFundsTest">
+                <methods>
+                    <exclude name="verifyLoginWithInvalidCredentials"/>
+                    <exclude name="verifyTransferRejectedWhenAmountIsZero"/>
+                    <exclude name="verifyTransferRejectedDueToInsufficientBalance"/>
+                </methods>
+            </class>
+
         </classes>
 
     </test>
