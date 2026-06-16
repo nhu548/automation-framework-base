@@ -25,10 +25,10 @@ public class LoginTest extends BaseTest {
     private DashboardPage loginWithValidCredentials() {
 
         String username =
-                ConfigReader.getProperty("username");
+                ConfigReader.getProperty("username1");
 
         String password =
-                ConfigReader.getProperty("password");
+                ConfigReader.getProperty("password1");
 
         return loginPage.login(username, password);
     }
