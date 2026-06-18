@@ -18,5 +18,19 @@ public class LoginApiClient {
                 .then()
                 .extract()
                 .response();
+
+    }
+
+    public String getCustomerId(
+            String username,
+            String password
+    ) {
+        Response response =
+                login(
+                        username,
+                        password
+                );
+
+        return response.xmlPath().getString("customer.id");
     }
 }
