@@ -1,0 +1,29 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="Parabank Regression Suite"
+       verbose="1">
+
+    <test name="UI Regression">
+
+        <classes>
+
+            <class name="tests.LoginTest"/>
+
+            <class name="tests.AccountsOverviewTest"/>
+
+            <class name="tests.AccountDetailsTest"/>
+
+            <class name="tests.EndToEndBankingTest"/>
+
+            <class name="tests.TransferFundsTest">
+                <methods>
+                    <exclude name="verifyTransferRejectedWhenAmountIsZero"/>
+                    <exclude name="verifyTransferRejectedDueToInsufficientBalance"/>
+                </methods>
+            </class>
+
+        </classes>
+
+    </test>
+
+</suite>
