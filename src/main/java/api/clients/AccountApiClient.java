@@ -1,35 +1,49 @@
 package api.clients;
 
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.testng.Assert;
-
 import java.math.BigDecimal;
 
-import static io.restassured.RestAssured.given;
-
+/**
+ * API client for account-related operations.
+ */
 public class AccountApiClient {
 
+    /**
+     * Get account details by account ID.
+     *
+     * @param accountId Account ID.
+     * @return Raw API response.
+     */
     public Response getAccountById(
             String accountId
     ) {
 
-        return given()
+        return RestAssured.given()
                 .log().all()
                 .header("Accept", "application/xml")
                 .when()
-                .get("/accounts/" + accountId)
+                .get("/accounts/{accountId}", accountId)
                 .then()
                 .extract()
                 .response();
     }
 
-    public Response createNewAccount(
+    /**
+     * Create a new account for a customer.
+     *
+     * @param customerId    Customer ID.
+     * @param accountType   Account type. Example: 0 = Checking, 1 = Savings.
+     * @param fromAccountId Source account ID used to fund the new account.
+     * @return Raw API response.
+     */
+    public Response createAccount(
             String customerId,
             String accountType,
             String fromAccountId
     ) {
 
-        return given()
+        return RestAssured.given()
                 .log().all()
                 .header("Accept", "application/xml")
                 .queryParam("customerId", customerId)
@@ -42,6 +56,12 @@ public class AccountApiClient {
                 .response();
     }
 
+    /**
+     * Get customer ID from account details.
+     *
+     * @param accountId Account ID.
+     * @return Customer ID.
+     */
     public String getCustomerIdByAccountId(
             String accountId
     ) {
@@ -49,72 +69,48 @@ public class AccountApiClient {
         Response response =
                 getAccountById(accountId);
 
-        Assert.assertEquals(
-                response.statusCode(),
-                200,
-                "Status code should be 200 when retrieving source account"
-        );
-
         String customerId =
                 response.xmlPath().getString("account.customerId");
-
-        assertFieldIsNotBlank(
-                customerId,
-                "Customer ID"
-        );
 
         return customerId;
     }
 
-    public void assertFieldIsNotBlank(
-            String actualValue,
-            String fieldName
-    ) {
-
-        Assert.assertNotNull(
-                actualValue,
-                fieldName + " should not be null"
-        );
-
-        Assert.assertFalse(
-                actualValue.trim().isEmpty(),
-                fieldName + " should not be empty"
-        );
-    }
-
-    public String createNewCheckingAccount(
-            String sourceAccountId
+    /**
+     * Create a new account using an existing account as the funding account.
+     *
+     * @param accountId   Existing account ID.
+     * @param accountType Account type. Example: 0 = Checking, 1 = Savings.
+     * @return New account ID.
+     */
+    public String createNewAccount(
+            String accountId,
+            String accountType
     ) {
 
         String customerId =
                 getCustomerIdByAccountId(
-                        sourceAccountId
+                        accountId
                 );
 
         Response response =
-                createNewAccount(
+                createAccount(
                         customerId,
-                        ApiTestData.CHECKING_ACCOUNT_TYPE,
-                        sourceAccountId
+                        accountType,
+                        accountId
                 );
-
-        Assert.assertEquals(
-                response.statusCode(),
-                200,
-                "Create account status code should be 200"
-        );
 
         String newAccountId =
                 response.xmlPath().getString("account.id");
 
-        assertFieldIsNotBlank(
-                newAccountId,
-                "New account ID"
-        );
-
         return newAccountId;
     }
 
+    /**
+     * Get account balance as BigDecimal for accurate money calculation.
+     *
+     * @param accountId Account ID.
+     * @return Account balance.
+     */
     public BigDecimal getAccountBalance(
             String accountId
     ) {
@@ -122,19 +118,14 @@ public class AccountApiClient {
         Response response =
                 getAccountById(accountId);
 
-        Assert.assertEquals(
-                response.statusCode(),
-                200,
-                "Status code should be 200 when retrieving account balance"
-        );
-
         String balance =
                 response.xmlPath().getString("account.balance");
 
-        assertFieldIsNotBlank(
-                balance,
-                "Account balance"
-        );
+        if (balance == null || balance.isBlank()) {
+            throw new IllegalStateException(
+                    "Account balance is missing for account ID: " + accountId
+            );
+        }
 
         return new BigDecimal(balance);
     }

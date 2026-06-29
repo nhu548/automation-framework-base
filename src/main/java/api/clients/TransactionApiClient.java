@@ -1,107 +1,82 @@
 package api.clients;
 
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.testng.Assert;
-
 import java.util.List;
 
-import static io.restassured.RestAssured.given;
-
+/**
+ * API client for transaction-related operations.
+ */
 public class TransactionApiClient {
 
-    //get transaction details by account id
-    public Response getTransactionsByAccountId(
-            String accountId
-    ) {
-        return given()
+    /**
+     * Get all transactions for an account
+     * @param accountId Account ID
+     * @return Raw API response
+     */
+    public Response getTransactionsByAccountId(String accountId) {
+
+        return RestAssured.given()
                 .log().all()
                 .header("Accept", "application/xml")
                 .when()
-                .get("/accounts/" + accountId + "/transactions")
+                .get("/accounts/{accountId}/transactions", accountId)
                 .then()
                 .extract()
                 .response();
     }
 
-    public List<String> getTransactionIdsByAccountId(
-            String accountId
-    ) {
+    /**
+     * Get transaction IDs from an account transaction list
+     * @param accountId Account ID
+     * @return List of transaction ID
+     */
+    public List<String> getTransactionIdsByAccountId(String accountId) {
 
-        Response response =
-                getTransactionsByAccountId(
-                        accountId
-                );
-
-        Assert.assertEquals(
-                response.statusCode(),
-                200,
-                "Status code should be 200 when retrieving transactions"
-        );
+        Response response = getTransactionsByAccountId(accountId);
 
         return response.xmlPath().getList(
                 "transactions.transaction.id"
         );
     }
 
-    // Get latest transaction ID by account ID
-    public String getLatestTransactionIdByAccountId(
-            String accountId
-    ) {
-
-        Response response =
-                getTransactionsByAccountId(
-                        accountId
-                );
-
-        Assert.assertEquals(
-                response.statusCode(),
-                200,
-                "Status code should be 200 when retrieving transactions"
-        );
-
-        List<String> transactionIds =
-                response.xmlPath().getList(
-                        "transactions.transaction.id"
-                );
-
-        Assert.assertFalse(
-                transactionIds.isEmpty(),
-                "Transaction list should not be empty"
-        );
-
-        return transactionIds.get(
-                transactionIds.size() - 1
-        );
-    }
-
+    /**
+     * Find the newly created transaction ID by comparing
+     * transaction IDs before and after an action.
+     *
+     * @param transactionIdsBefore Transaction IDs before action.
+     * @param transactionIdsAfter  Transaction IDs after action.
+     * @return Newly created transaction ID.
+     */
     public String findNewTransactionId(
             List<String> transactionIdsBefore,
             List<String> transactionIdsAfter
     ) {
 
         for (String transactionId : transactionIdsAfter) {
-
-            if (!transactionIdsBefore.contains(
-                    transactionId
-            )) {
-
+            if (!transactionIdsBefore.contains(transactionId)) {
                 return transactionId;
             }
         }
 
-        return null;
+        throw new IllegalStateException(
+                "No new transaction ID was found after the action."
+        );
     }
 
-    // Get transaction details by transaction ID
-    public Response getTransactionById(
-            String transactionId
-    ) {
+    /**
+     * Get transaction details by transaction ID.
+     *
+     * @param transactionId Transaction ID.
+     * @return Raw API response.
+     */
+    public Response getTransactionById(String transactionId) {
 
-        return given()
+        return RestAssured.given()
                 .log().all()
                 .header("Accept", "application/xml")
                 .when()
-                .get("/transactions/" + transactionId)
+                .get("/transactions/{transactionId}", transactionId)
                 .then()
                 .extract()
                 .response();
