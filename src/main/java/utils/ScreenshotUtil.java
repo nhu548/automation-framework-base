@@ -12,49 +12,92 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ScreenshotUtil {
+/**
+ * Utility class for capturing screenshots.
+ * Used mainly when a test fails so the screenshot
+ * can be attached to the test report.
+ */
+public final class ScreenshotUtil {
 
+    // =========================================================
+    // CONSTANTS
+    // =========================================================
+
+    // Logger for recording success or failure messages
     private static final Logger logger =
-            LoggerFactory.getLogger(api.testdata.utils.ScreenshotUtil.class);
+            LoggerFactory.getLogger(ScreenshotUtil.class);
 
-    private static final String SCREENSHOT_FOLDER =
-            "screenshots/";
+    // Folder where screenshots will be stored
+    private static final String SCREENSHOT_FOLDER = "test-output/screenshots/";
 
-    public static void captureScreenshot(WebDriver driver, String testName) {
+    private ScreenshotUtil() {
+        // Prevent instantiation
+    }
 
-        TakesScreenshot ts = (TakesScreenshot) driver;
+    // =========================================================
+    // PUBLIC METHODS
+    // =========================================================
 
-        File source = ts.getScreenshotAs(OutputType.FILE);
+    /**
+     * Capture the current browser screen.
+     *
+     * @param driver Current WebDriver instance.
+     * @param testName Current test name.
+     * @return Relative screenshot path if successful; otherwise {@code null}.
+     */
+    public static String captureScreenshot(WebDriver driver, String testName) {
 
+        ensureScreenshotFolderExists();
+
+        // Generate a unique timestamp to avoid duplicate file names
         String timestamp =
                 new SimpleDateFormat("yyyyMMdd_HHmmss")
                         .format(new Date());
 
-        String screenshotPath =
-                SCREENSHOT_FOLDER
-                        + testName
-                        + "_"
-                        + timestamp
-                        + ".png";
+        String fileName =
+                testName + "_" + timestamp + ".png";
 
-        File destination = new File(screenshotPath);
+        String screenshotPath =
+                SCREENSHOT_FOLDER + fileName;
 
         try {
 
+            TakesScreenshot ts = (TakesScreenshot) driver;
+
+            // Take a screenshot from the current browser
+            File source = ts.getScreenshotAs(OutputType.FILE);
+
+            // Destination file
+            File destination = new File(screenshotPath);
+
+            // Save screenshot to local folder
             FileUtils.copyFile(source, destination);
 
-            logger.info(
-                    "Screenshot saved successfully: {}",
-                    screenshotPath
-            );
+            logger.info("Screenshot saved successfully: {}", screenshotPath);
+
+            return "screenshots/" + fileName;
 
         } catch (IOException e) {
 
-            logger.error(
-                    "Failed to save screenshot: {}",
-                    screenshotPath,
-                    e
-            );
+            logger.error("Failed to save screenshot: {}", screenshotPath, e);
+
+            return null;
+        }
+    }
+
+    // =========================================================
+    // PRIVATE HELPERS
+    // =========================================================
+    /**
+     * Create screenshot folder if it does not exist.
+     */
+    private static void ensureScreenshotFolderExists() {
+
+        File folder =
+                new File(SCREENSHOT_FOLDER);
+
+        if (!folder.exists()) {
+            folder.mkdirs();
         }
     }
 }
