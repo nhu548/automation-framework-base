@@ -1,143 +1,162 @@
-package tests;
+package ui.tests;
 
-import base.BaseAuthenticatedTest;
+import ui.base.BaseAuthenticatedTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import ui.pages.AccountDetailsPage;
 import ui.pages.AccountsOverviewPage;
 import ui.pages.OpenNewAccountPage;
 import ui.pages.TransferPage;
-import testdata.OpenAccountTestData;
-import testdata.TransferTestData;
+import ui.testdata.UITestData;
+
+import java.math.BigDecimal;
 
 public class EndToEndBankingTest extends BaseAuthenticatedTest {
 
-    private static final String TRANSFER_AMOUNT =
-            "50";
+    @Test(description = "E2E01 - Verify user can create account, transfer funds, and validate balances and transaction history")
+    public void E2E01_verifyCreateAccountTransferFundsAndTransactionHistory() {
 
-    private static final double TRANSFER_AMOUNT_VALUE =
-            50.00;
-
-    private static final String RECEIVED_TRANSACTION =
-            "Funds Transfer Received";
-
-    // =========================================================
-    // E2E - Create account, transfer funds, verify transaction
-    // =========================================================
-    @Test(description = "Verify user can create account, transfer funds, and validate balances and transaction history")
-    public void verifyCreateAccountTransferFundsAndTransactionHistory() {
-
-        test.info("STEP 4 - Navigate to Accounts Overview");
+        test.info("STEP 1 - Navigate to Accounts Overview page");
 
         AccountsOverviewPage accountsOverviewPage =
                 dashboardPage.navigateToAccountsOverview();
 
-        String sourceAccount =
+        String sourceAccountId =
                 accountsOverviewPage.getFirstAccountNumber();
 
-        test.info("STEP 1 - Navigate to Open New Account page");
+        test.info("Source Account ID: " + sourceAccountId);
+
+        test.info("STEP 2 - Navigate to Open New Account page");
+
         OpenNewAccountPage openNewAccountPage =
                 dashboardPage.navigateToOpenNewAccount();
 
-        test.info("STEP 2 - Create new checking account");
-        openNewAccountPage.openNewAccount(
-                OpenAccountTestData.CHECKING_ACCOUNT_TYPE,sourceAccount
-        );
+        test.info("STEP 3 - Create new checking account");
 
-        test.info("STEP 3 - Get newly created account number");
-        String newAccountNumber =
-                openNewAccountPage.getNewAccountNumber();
+        String destinationAccountId =
+                openNewAccountPage.openNewAccountAndGetAccountId(
+                        UITestData.CHECKING_ACCOUNT_TYPE,
+                        sourceAccountId
+        );
 
         Assert.assertFalse(
-                newAccountNumber.isEmpty(),
-                "New account number should not be empty"
+                destinationAccountId.isBlank(),
+                "Destination account ID should not be empty"
         );
 
-        test.info("New Account Number = " + newAccountNumber);
+        test.info("Destination Account ID: " + destinationAccountId);
 
-        test.info("STEP 4 - Navigate to Accounts Overview");
+        test.info("STEP 4 - Navigate back to Accounts Overview page");
 
         accountsOverviewPage =
                 dashboardPage.navigateToAccountsOverview();
 
-        test.info("STEP 5 - Get source account balance before transfer");
+        test.info("STEP 5 - Get account balances before transfer");
 
-        double sourceBalanceBefore =
-                accountsOverviewPage.getAccountBalance(sourceAccount);
+        BigDecimal sourceBalanceBefore =
+                accountsOverviewPage.getAccountBalance(sourceAccountId);
 
-        test.info("STEP 6 - Get new account balance before transfer");
+        BigDecimal destinationBalanceBefore =
+                accountsOverviewPage.getAccountBalance(destinationAccountId);
 
-        double newAccountBalanceBefore =
-                accountsOverviewPage.getAccountBalance(newAccountNumber);
+        test.info("Source Balance Before: " + sourceBalanceBefore);
+        test.info("Destination Balance Before: " + destinationBalanceBefore);
 
-        test.info("STEP 7 - Navigate to Transfer Funds page");
+        test.info("STEP 6 - Navigate to Transfer Funds page");
 
         TransferPage transferPage =
                 dashboardPage.navigateToTransferFunds();
 
-        test.info("STEP 8 - Transfer funds from source account to new account");
+        test.info("STEP 7 - Transfer funds from source account to destination account");
 
         transferPage.transferFunds(
-                TransferTestData.FROM_ACCOUNT,
-                        newAccountNumber,
-                TRANSFER_AMOUNT
+                sourceAccountId,
+                destinationAccountId,
+                UITestData.VALID_TRANSFER_AMOUNT
                 );
 
-        test.info("STEP 9 - Verify transfer completed successfully");
+        test.info("STEP 8 - Verify transfer completed successfully");
+
         Assert.assertTrue(
-                transferPage.isTransferSuccess(),
+                transferPage.isTransferSuccessful(),
                 "Transfer should complete successfully"
         );
 
         Assert.assertEquals(
                 transferPage.getTransferSuccessMessage(),
-                TransferTestData.SUCCESS_MESSAGE,
+                UITestData.TRANSFER_SUCCESS_MESSAGE,
                 "Incorrect transfer success message displayed"
         );
 
-        test.info("STEP 10 - Navigate back to Accounts Overview");
+        test.info("STEP 9 - Navigate back to Accounts Overview");
 
         accountsOverviewPage =
                 dashboardPage.navigateToAccountsOverview();
 
-        test.info("STEP 11 - Get source account balance after transfer");
-        double sourceBalanceAfter =
-                accountsOverviewPage.getAccountBalance(sourceAccount);
+        test.info("STEP 10 - Get source account balance after transfer");
 
-        test.info("STEP 12 - Get new account balance after transfer");
+        BigDecimal sourceBalanceAfter =
+                accountsOverviewPage.getAccountBalance(sourceAccountId);
 
-        double newAccountBalanceAfter =
-                accountsOverviewPage.getAccountBalance(newAccountNumber);
+        BigDecimal destinationBalanceAfter  =
+                accountsOverviewPage.getAccountBalance(destinationAccountId);
 
-        test.info("STEP 13 - Verify source account balance decreased by transfer amount");
+        test.info("Source Balance After: " + sourceBalanceAfter);
+        test.info("Destination Balance After: " + destinationBalanceAfter);
+
+        test.info("STEP 11 - Verify source account balance decreased by transfer amount");
+        BigDecimal transferAmount =
+                new BigDecimal(
+                        UITestData.VALID_TRANSFER_AMOUNT
+                );
+
         Assert.assertEquals(
                 sourceBalanceAfter,
-                sourceBalanceBefore - TRANSFER_AMOUNT_VALUE,
-                0.01,
+                sourceBalanceBefore.subtract(transferAmount),
                 "Source account balance should decrease by transfer amount"
         );
 
-        test.info("STEP 14 - Verify new account balance increased by transfer amount");
+        test.info("STEP 12 - Verify destination account balance increased by transfer amount");
+
         Assert.assertEquals(
-                newAccountBalanceAfter,
-                newAccountBalanceBefore + TRANSFER_AMOUNT_VALUE,
-                0.01,
+                destinationBalanceAfter,
+                destinationBalanceBefore.add(transferAmount),
                 "New account balance should increase by transfer amount"
         );
 
-        test.info("STEP 15 - Open new account details");
+        test.info("STEP 13 - Open source account details page");
+
+        AccountDetailsPage sourceAccountDetailsPage =
+                accountsOverviewPage.clickAccountByNumber(sourceAccountId);
+
+        test.info("STEP 14 - Verify sent transaction is displayed in source account transaction history");
+
+        Assert.assertTrue(
+                sourceAccountDetailsPage.isTransactionDisplayed(
+                        UITestData.SENT_TRANSACTION,
+                        "$" + transferAmount
+                ),
+                "Sent transaction should be displayed in source account with correct amount"
+        );
+
+        test.info("STEP 15 - Open destination account details page");
+
+        accountsOverviewPage =
+                dashboardPage.navigateToAccountsOverview();
+
         AccountDetailsPage accountDetailsPage =
-                accountsOverviewPage.clickAccountByNumber(newAccountNumber);
+                accountsOverviewPage.clickAccountByNumber(destinationAccountId);
 
         test.info("STEP 16 - Verify received transaction is displayed in transaction history");
+
         Assert.assertTrue(
                 accountDetailsPage.isTransactionDisplayed(
-                        RECEIVED_TRANSACTION,
-                        "$" + TRANSFER_AMOUNT + ".00"
+                        UITestData.RECEIVED_TRANSACTION,
+                        "$" + transferAmount
                 ),
                 "Received transaction should be displayed with correct amount"
         );
 
-        test.pass("End-to-end banking flow verified successfully");
+        test.pass("PASSED - E2E01 - Create account, transfer funds, balance update, and transaction history verified successfully");
     }
 }

@@ -1,6 +1,6 @@
-package tests;
+package ui.tests;
 
-import base.BaseAuthenticatedTest;
+import ui.base.BaseAuthenticatedTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -22,11 +22,11 @@ public class AccountsOverviewTest extends BaseAuthenticatedTest {
     }
 
     // =========================================================
-    // TC01 - Verify accounts overview table is displayed
+    // UI05 - Verify accounts overview table is displayed
     // =========================================================
 
-    @Test(description = "Verify accounts overview table is displayed")
-    public void verifyAccountsOverviewTableDisplayed() {
+    @Test(description = "UI05 - Verify accounts overview table is displayed")
+    public void UI05_verifyAccountsOverviewTableDisplayed() {
 
         test.info("STEP 1 - Verify accounts table is displayed");
 
@@ -38,15 +38,15 @@ public class AccountsOverviewTest extends BaseAuthenticatedTest {
                 "Accounts overview table should be displayed"
         );
 
-        test.pass("Accounts overview table displayed successfully");
+        test.pass("PASSED - UI05 - Verify accounts overview table is displayed");
     }
 
     // =========================================================
-    // TC02 - Verify customer accounts are displayed
+    // UI06 - Verify customer accounts are displayed
     // =========================================================
 
-    @Test(description = "Verify customer accounts are displayed")
-    public void verifyCustomerAccountsDisplayed() {
+    @Test(description = "UI06 - Verify customer accounts are displayed")
+    public void UI06_verifyCustomerAccountsDisplayed() {
 
         test.info("STEP 1 - Get total accounts");
 
@@ -60,15 +60,15 @@ public class AccountsOverviewTest extends BaseAuthenticatedTest {
                 "Customer should have at least one account"
         );
 
-        test.pass("Customer accounts displayed successfully");
+        test.pass("PASSED - UI06 - Verify customer accounts are displayed");
     }
 
     // =========================================================
-    // TC03 - Verify user can open account details
+    // UI07 - Verify user can open account details
     // =========================================================
 
-    @Test(description = "Verify user can open account details")
-    public void verifyUserCanOpenAccountDetails() {
+    @Test(description = "UI07 - Verify user can open account details")
+    public void UI07_verifyUserCanOpenAccountDetails() {
 
         test.info("STEP 1 - Click first account");
 
@@ -81,15 +81,15 @@ public class AccountsOverviewTest extends BaseAuthenticatedTest {
                 "Account details page should open"
         );
 
-        test.pass("Account details page opened successfully");
+        test.pass("PASSED - UI07 - Verify user can open account details");
     }
 
     // =========================================================
-    // TC04 -  Verify Customer Account Information Displayed
+    // UI08 - Verify customer account information displayed
     // =========================================================
 
-    @Test(description = "Verify customer account information displayed")
-    public void verifyCustomerAccountInformationDisplayed() {
+    @Test(description = "UI08 - Verify customer account information displayed")
+    public void UI08_verifyCustomerAccountInformationDisplayed() {
 
         test.info("STEP 1 - Get first account balance");
 
@@ -103,6 +103,6 @@ public class AccountsOverviewTest extends BaseAuthenticatedTest {
                 "Balance format is invalid"
         );
 
-        test.pass("Account information displayed successfully");
+        test.pass("PASSED - UI08 - Verify customer account information displayed");
     }
 }

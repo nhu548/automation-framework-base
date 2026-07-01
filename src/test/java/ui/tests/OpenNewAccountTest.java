@@ -1,12 +1,13 @@
-package tests;
+package ui.tests;
 
-import base.BaseAuthenticatedTest;
+import ui.base.BaseAuthenticatedTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import ui.pages.AccountsOverviewPage;
 import ui.pages.OpenNewAccountPage;
-import testdata.OpenAccountTestData;
+import ui.testdata.UITestData;
+import utils.ConfigReader;
 
 import java.util.List;
 
@@ -14,8 +15,8 @@ public class OpenNewAccountTest extends BaseAuthenticatedTest {
 
     private OpenNewAccountPage openNewAccountPage;
 
-    private static final String SUCCESS_MESSAGE =
-            "Account Opened!";
+    private final String primarySourceAccountId =
+            ConfigReader.getProperty("primarySourceAccountId");
 
     // =========================================================
     // SETUP
@@ -29,43 +30,11 @@ public class OpenNewAccountTest extends BaseAuthenticatedTest {
     }
 
     // =========================================================
-    // SETUP
+    // UI14 - Verify Open New Account page is displayed
     // =========================================================
 
-    private String createCheckingAccountAndGetAccountNumber() {
-
-        openNewAccountPage.openNewAccount(
-                OpenAccountTestData.CHECKING_ACCOUNT_TYPE,OpenAccountTestData.FROM_ACCOUNT
-        );
-
-        Assert.assertEquals(
-                openNewAccountPage.getSuccessMessage(),
-                SUCCESS_MESSAGE,
-                "Incorrect success message displayed"
-        );
-
-        String newAccountNumber =
-                openNewAccountPage.getNewAccountNumber();
-
-        Assert.assertFalse(
-                newAccountNumber.isEmpty(),
-                "New account number should not be empty"
-        );
-
-        Assert.assertTrue(
-                newAccountNumber.matches("\\d+"),
-                "New account number should contain digits only"
-        );
-
-        return newAccountNumber;
-    }
-
-    // =========================================================
-    // TC01 - Verify Open New Account page is displayed
-    // =========================================================
-
-    @Test(description = "Verify Open New Account page is displayed")
-    public void verifyOpenNewAccountPageDisplayed() {
+    @Test(description = "UI14 - Verify Open New Account page is displayed")
+    public void UI14_verifyOpenNewAccountPageDisplayed() {
 
         test.info("STEP 1 - Verify Open New Account page is displayed");
 
@@ -74,67 +43,78 @@ public class OpenNewAccountTest extends BaseAuthenticatedTest {
                 "Open New Account page should be displayed"
         );
 
-        test.pass("Open New Account page displayed successfully");
+        test.pass("PASSED - UI14 - Verify Open New Account page is displayed");
     }
 
     // =========================================================
-    // TC02 - Verify user can create a new checking account
+    // UI15 - Verify user can create a new checking account
     // =========================================================
 
-    @Test(description = "Verify user can create a new checking account")
-    public void verifyCreateNewCheckingAccount() {
+    @Test(description = "UI15 - Verify user can create a new checking account")
+    public void UI15_verifyCreateNewCheckingAccount() {
 
-        test.info(
-                "STEP 1 - Create new checking account"
-        );
+        test.info("STEP 1 - Create new checking account");
 
         String newAccountNumber =
-                createCheckingAccountAndGetAccountNumber();
+                openNewAccountPage.openNewAccountAndGetAccountId(
+                        UITestData.CHECKING_ACCOUNT_TYPE,
+                        primarySourceAccountId
+                        );
 
-        test.pass(
-                "New checking account created successfully with account number: "
-                        + newAccountNumber
+        Assert.assertNotNull(
+                newAccountNumber,
+                "New account number should not be null"
         );
+
+        Assert.assertFalse(
+                newAccountNumber.trim().isEmpty(),
+                "New account number should not be empty"
+        );
+
+        test.pass("PASSED - UI15 - Verify user can create a new checking account");
     }
     // =========================================================
-    // TC03 - Verify newly created account appears in Accounts Overview
+    // UI16 - Verify newly created account appears in Accounts Overview
     // =========================================================
 
-    @Test(description = "Verify newly created account appears in Accounts Overview")
-    public void verifyNewAccountAppearsInAccountsOverview() {
+    @Test(description = "UI16 - Verify newly created account appears in Accounts Overview")
+    public void UI16_verifyNewAccountAppearsInAccountsOverview() {
 
-        test.info(
-                "STEP 1 - Create new checking account"
-        );
+        test.info("STEP 1 - Create new checking account");
 
         String newAccountNumber =
-                createCheckingAccountAndGetAccountNumber();
+                openNewAccountPage.openNewAccountAndGetAccountId(
+                        UITestData.CHECKING_ACCOUNT_TYPE,
+                        primarySourceAccountId
+                );
 
-        test.info(
-                "STEP 2 - Navigate to Accounts Overview"
+        Assert.assertNotNull(
+                newAccountNumber,
+                "New account number should not be null"
         );
+
+        Assert.assertFalse(
+                newAccountNumber.trim().isEmpty(),
+                "New account number should not be empty"
+        );
+
+        test.info("STEP 2 - Navigate to Accounts Overview");
 
         AccountsOverviewPage accountsOverviewPage =
                 dashboardPage.navigateToAccountsOverview();
 
-        test.info(
-                "STEP 3 - Get account numbers from Accounts Overview"
-        );
+        test.info("STEP 3 - Get account numbers from Accounts Overview");
 
         List<String> accountNumbers =
                 accountsOverviewPage.getAccountNumbers();
 
-        test.info(
-                "STEP 4 - Verify new account exists in Accounts Overview"
-        );
+        test.info("STEP 4 - Verify new account exists in Accounts Overview");
 
         Assert.assertTrue(
                 accountNumbers.contains(newAccountNumber),
                 "New account should appear in Accounts Overview"
         );
 
-        test.pass(
-                "New account appears in Accounts Overview successfully"
-        );
+        test.pass("PASSED - UI16 - Verify newly created account appears in Accounts Overview");
     }
 }

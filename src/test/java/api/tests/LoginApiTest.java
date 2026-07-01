@@ -12,14 +12,27 @@ import utils.ConfigReader;
 
 public class LoginApiTest extends BaseApiTest {
 
-    private final String username =
-            ConfigReader.getProperty("username1");
-
-    private final String password =
-            ConfigReader.getProperty("password1");
-
     private final LoginApiClient loginApiClient =
             new LoginApiClient();
+
+    private final String primaryUsername =
+            ConfigReader.getProperty("primaryUsername");
+
+    private final String primaryPassword =
+            ConfigReader.getProperty("primaryPassword");
+
+    private final String primaryFirstName =
+            ConfigReader.getProperty("primaryFirstName");
+
+    private final String primaryLastName =
+            ConfigReader.getProperty("primaryLastName");
+
+    private final String primaryPhoneNumber =
+            ConfigReader.getProperty("primaryPhoneNumber");
+
+    // =========================================================
+    // API01 - Verify user can login successfully with valid credentials
+    // =========================================================
 
     @Test(description = "API01 - Verify user can login successfully with valid credentials")
     public void API01_verifyUserCanLoginSuccessfullyWithValidCredentials() {
@@ -28,8 +41,8 @@ public class LoginApiTest extends BaseApiTest {
 
         Response response =
                 loginApiClient.login(
-                        username,
-                        password
+                        primaryUsername,
+                        primaryPassword
                 );
 
         Reporter.log("STEP 2 - Verify response status code is 200", true);
@@ -66,24 +79,28 @@ public class LoginApiTest extends BaseApiTest {
 
         Assert.assertEquals(
                 firstName,
-                ApiTestData.EXPECTED_FIRST_NAME,
+                primaryFirstName,
                 "First name should match"
         );
 
         Assert.assertEquals(
                 lastName,
-                ApiTestData.EXPECTED_LAST_NAME,
+                primaryLastName,
                 "Last name should match"
         );
 
         Assert.assertEquals(
                 phoneNumber,
-                ApiTestData.EXPECTED_PHONE_NUMBER,
+                primaryPhoneNumber,
                 "Phone number should match"
         );
 
         Reporter.log("PASSED - API01 - Verify user can login successfully with valid credentials", true);
     }
+
+    // =========================================================
+    // API02 - Verify login request returns error for invalid username
+    // =========================================================
 
     @Test(description = "API02 - Verify login request returns error for invalid username")
     public void API02_verifyLoginRequestReturnsErrorForInvalidUsername() {
@@ -96,7 +113,7 @@ public class LoginApiTest extends BaseApiTest {
         Response response =
                 loginApiClient.login(
                         ApiTestData.INVALID_USERNAME,
-                        password
+                        primaryPassword
                 );
 
         Reporter.log(
@@ -128,6 +145,10 @@ public class LoginApiTest extends BaseApiTest {
         Reporter.log("PASSED - API02 - Verify login request returns error for invalid username", true);
     }
 
+    // =========================================================
+    // API03 - Verify login request returns error for invalid password
+    // =========================================================
+
     @Test(description = "API03 - Verify login request returns error for invalid password")
     public void API03_verifyLoginRequestReturnsErrorForInvalidPassword() {
 
@@ -138,7 +159,7 @@ public class LoginApiTest extends BaseApiTest {
 
         Response response =
                 loginApiClient.login(
-                        username,
+                        primaryUsername,
                         ApiTestData.INVALID_PASSWORD
                 );
 

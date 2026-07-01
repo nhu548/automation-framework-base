@@ -3,24 +3,19 @@ package api.tests;
 
 import api.base.BaseApiTest;
 import api.clients.AccountApiClient;
-import api.clients.LoginApiClient;
 import api.clients.CustomerApiClient;
-import api.testdata.ApiTestData;
+import api.clients.LoginApiClient;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 import utils.ConfigReader;
+import utils.AssertUtil;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class CustomerApiTest extends BaseApiTest {
-
-    private final String username =
-            ConfigReader.getProperty("username1");
-
-    private final String password =
-            ConfigReader.getProperty("password1");
 
     private final LoginApiClient loginApiClient =
             new LoginApiClient();
@@ -31,6 +26,34 @@ public class CustomerApiTest extends BaseApiTest {
     private final AccountApiClient accountApiClient =
             new AccountApiClient();
 
+    private final String primaryUsername =
+            ConfigReader.getProperty("primaryUsername");
+
+    private final String primaryPassword =
+            ConfigReader.getProperty("primaryPassword");
+
+    private final String secondaryUsername =
+            ConfigReader.getProperty("secondaryUsername");
+
+    private final String secondaryPassword =
+            ConfigReader.getProperty("secondaryPassword");
+
+    private final String primaryFirstName =
+            ConfigReader.getProperty("primaryFirstName");
+
+    private final String primaryLastName =
+            ConfigReader.getProperty("primaryLastName");
+
+    private final String primaryPhoneNumber=
+            ConfigReader.getProperty("primaryPhoneNumber");
+
+    private final String primaryCustomerId =
+            ConfigReader.getProperty("primaryCustomerId");
+
+    // =========================================================
+    // API04 - Verify customer details can be retrieved successfully
+    // =========================================================
+
     @Test(description = "API04 - Verify customer details can be retrieved successfully")
     public void API04_verifyCustomerDetailsCanBeRetrievedSuccessfully() {
 
@@ -38,8 +61,8 @@ public class CustomerApiTest extends BaseApiTest {
 
         String getCustomerId =
                 loginApiClient.getCustomerId(
-                        username,
-                        password
+                        primaryUsername,
+                        primaryPassword
                 );
 
         Response response =
@@ -64,7 +87,7 @@ public class CustomerApiTest extends BaseApiTest {
         Reporter.log("STEP 4 - Verify customer ID matches requested customer ID.", true);
         Assert.assertEquals(
                 customerId,
-                ApiTestData.VALID_CUSTOMER_ID,
+                primaryCustomerId,
                 "Customer ID should match the requested customer ID"
         );
 
@@ -72,7 +95,7 @@ public class CustomerApiTest extends BaseApiTest {
 
         Assert.assertEquals(
                 firstName,
-                ApiTestData.EXPECTED_FIRST_NAME,
+                primaryFirstName,
                 "First name should match"
         );
 
@@ -80,7 +103,7 @@ public class CustomerApiTest extends BaseApiTest {
 
         Assert.assertEquals(
                 lastName,
-                ApiTestData.EXPECTED_LAST_NAME,
+                primaryLastName,
                 "Last name should match"
         );
 
@@ -88,11 +111,11 @@ public class CustomerApiTest extends BaseApiTest {
 
         Assert.assertEquals(
                 phoneNumber,
-                ApiTestData.EXPECTED_PHONE_NUMBER,
+                primaryPhoneNumber,
                 "Phone number should match"
         );
 
-        accountApiClient.assertFieldIsNotBlank(
+        AssertUtil.assertFieldIsNotBlank(
                 city,
                 "HCM"
         );
@@ -101,14 +124,19 @@ public class CustomerApiTest extends BaseApiTest {
 
     }
 
+    // =========================================================
+    // API05 - Verify customer accounts can be retrieved successfully
+    // =========================================================
+
     @Test(description = "API05 - Verify customer accounts can be retrieved successfully")
     public void API05_verifyCustomerAccountsCanBeRetrievedSuccessfully() {
 
         Reporter.log("STEP 1 - Get customer ID from login API", true);
+
         String customerId =
                 loginApiClient.getCustomerId(
-                        username,
-                        password
+                        secondaryUsername,
+                        secondaryPassword
                 );
 
         Assert.assertNotNull(
@@ -128,7 +156,7 @@ public class CustomerApiTest extends BaseApiTest {
                 "Customer accounts API status code should be 200"
         );
 
-        Reporter.log("STEP 4 - Verify at least one account is returned", true);
+        Reporter.log("STEP 3 - Verify at least one account is returned", true);
 
         List<String> accountIds =
                 response.xmlPath().getList("accounts.account.id");
@@ -139,36 +167,46 @@ public class CustomerApiTest extends BaseApiTest {
         );
 
 
-        Reporter.log("STEP 3 - Verify account information is returned.", true);
+        Reporter.log("STEP 4 - Verify first account details are returned.", true);
 
          String accountId = response.xmlPath().getString("accounts.account[0].id");
          String accountType = response.xmlPath().getString("accounts.account[0].type");
          String accountBalance = response.xmlPath().getString("accounts.account[0].balance");
 
-        Reporter.log("STEP 4 - Verify account ID is returned.", true);
-        Assert.assertNotNull(
+        AssertUtil.assertFieldIsNotBlank(
                 accountId,
-                "Account ID should be returned"
+                "Account ID"
         );
 
-        Reporter.log("STEP 5 - Verify account type is returned.", true);
-
-        Assert.assertNotNull(
+        AssertUtil.assertFieldIsNotBlank(
                 accountType,
-                "Account type should be returned"
+                "Account Type"
         );
 
-        Reporter.log("STEP 6 - Verify account balance is returned.", true);
-
-        Assert.assertNotNull(
-                accountBalance,
-                "Account balance should be returned"
-        );
-
-        double balance = Double.parseDouble(accountBalance);
         Assert.assertTrue(
-                balance >= 0,
-                "Account balance should be greater than or equal to zero"
+                accountType.equals("CHECKING")
+                        || accountType.equals("SAVINGS"),
+                "Account type should be CHECKING or SAVINGS"
+        );
+
+        AssertUtil.assertFieldIsNotBlank(
+                accountBalance,
+                "Account Balance"
+        );
+
+        Reporter.log("STEP 5 - Verify account balance is valid", true);
+
+        AssertUtil.assertFieldIsNotBlank(
+                accountBalance,
+                "Account balance"
+        );
+
+        BigDecimal balance =
+                new BigDecimal(accountBalance);
+
+        Reporter.log(
+                "Account balance can be parsed successfully: " + balance,
+                true
         );
 
         Reporter.log("PASSED - API05 - Verify customer accounts can be retrieved successfully", true);

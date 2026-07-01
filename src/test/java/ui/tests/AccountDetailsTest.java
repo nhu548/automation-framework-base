@@ -1,6 +1,6 @@
-package tests;
+package ui.tests;
 
-import base.BaseAuthenticatedTest;
+import ui.base.BaseAuthenticatedTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -12,6 +12,7 @@ import java.util.List;
 public class AccountDetailsTest extends BaseAuthenticatedTest {
 
     private AccountsOverviewPage accountsOverviewPage;
+
     private AccountDetailsPage accountDetailsPage;
 
     // =========================================================
@@ -31,11 +32,11 @@ public class AccountDetailsTest extends BaseAuthenticatedTest {
     }
 
     // =========================================================
-    // TC01 - Verify transaction table is displayed
+    // UI09 - Verify transaction table is displayed
     // =========================================================
 
-    @Test(description = "Verify transaction table is displayed")
-    public void verifyTransactionTableDisplayed() {
+    @Test(description = "UI09 - Verify transaction table is displayed")
+    public void UI09_verifyTransactionTableDisplayed() {
 
         test.info("STEP 1 - Verify transaction table is displayed");
 
@@ -47,14 +48,14 @@ public class AccountDetailsTest extends BaseAuthenticatedTest {
                 "Transaction table should be displayed"
         );
 
-        test.pass("Transaction table displayed successfully");
+        test.pass("PASSED - UI09 - Verify transaction table is displayed");
     }
 
     // =========================================================
-    // TC02 - Verify transaction history exists
+    // UI10 - Verify transaction history exists
     // =========================================================
-    @Test(description = "Verify transaction history exists")
-    public void verifyTransactionHistoryExists() {
+    @Test(description = "UI10 - Verify transaction history exists")
+    public void UI10_verifyTransactionHistoryExists() {
 
         test.info("STEP 1 - Get transaction count");
 
@@ -68,15 +69,15 @@ public class AccountDetailsTest extends BaseAuthenticatedTest {
                 "Account should have at least one transaction"
         );
 
-        test.pass("Transaction history exists successfully");
+        test.pass("PASSED - UI10 - Verify transaction history exists");
     }
 
     // =========================================================
-    // TC03 - Verify transaction date format
+    // UI11 - Verify transaction date format
     // =========================================================
 
-    @Test(description = "Verify transaction date format")
-    public void verifyTransactionDateFormat(){
+    @Test(description = "UI11 - Verify transaction date format")
+    public void UI11_verifyTransactionDateFormat(){
 
         test.info("STEP 1 - Get transaction dates");
 
@@ -92,15 +93,15 @@ public class AccountDetailsTest extends BaseAuthenticatedTest {
             );
         }
 
-        test.pass("Transaction date format verified successfully");
+        test.pass("PASSED - UI11 - Verify transaction date format");
     }
 
     // =========================================================
-    // TC04 - Verify transaction amount format
+    // UI12 - Verify transaction amounts are displayed in valid currency format
     // =========================================================
 
-    @Test(description = "Verify transaction amounts are displayed in valid currency format")
-    public void verifyTransactionAmountFormat() {
+    @Test(description = "UI12 - Verify transaction amounts are displayed in valid currency format")
+    public void UI12_verifyTransactionAmountFormat() {
 
         test.info("STEP 1 - Get transaction amounts");
 
@@ -123,15 +124,15 @@ public class AccountDetailsTest extends BaseAuthenticatedTest {
             );
         }
 
-        test.pass("Transaction amount format verified successfully");
+        test.pass("PASSED - UI12 - Verify transaction amounts are displayed in valid currency format");
     }
 
     // =========================================================
-    // TC05 - Verify transaction description displayed
+    // UI13 - Verify transaction description displayed
     // =========================================================
 
-    @Test(description = "Verify transaction description displayed")
-    public void verifyTransactionDescriptionDisplayed() {
+    @Test(description = "UI13 - Verify transaction description displayed")
+    public void UI13_verifyTransactionDescriptionDisplayed() {
 
         test.info("STEP 1 - Get transaction descriptions");
 
@@ -170,6 +171,6 @@ public class AccountDetailsTest extends BaseAuthenticatedTest {
             );
         }
 
-        test.pass("Transaction descriptions verified successfully");
+        test.pass("PASSED - UI13 - Verify transaction description displayed");
     }
 }

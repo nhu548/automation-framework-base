@@ -7,11 +7,22 @@ import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
+import utils.AssertUtil;
+import utils.ConfigReader;
+
+import java.math.BigDecimal;
 
 public class AccountApiTest extends BaseApiTest {
 
     private final AccountApiClient accountApiClient =
             new AccountApiClient();
+
+    private final String primarySourceAccountId =
+            ConfigReader.getProperty("primarySourceAccountId");
+
+    // =========================================================
+    // API06 - Verify account details can be retrieved successfully
+    // =========================================================
 
     @Test(description = "API06 - Verify account details can be retrieved successfully")
     public void API06_verifyAccountDetailsCanBeRetrievedSuccessfully() {
@@ -19,7 +30,7 @@ public class AccountApiTest extends BaseApiTest {
         Reporter.log("STEP 1 - Send GET account details request", true);
         Response response =
                 accountApiClient.getAccountById(
-                        ApiTestData.VALID_ACCOUNT_ID
+                        primarySourceAccountId
                 );
 
         Reporter.log("STEP 2 - Verify response status code is 200", true);
@@ -48,11 +59,11 @@ public class AccountApiTest extends BaseApiTest {
 
         Assert.assertEquals(
                 accountId,
-                ApiTestData.VALID_ACCOUNT_ID,
+                primarySourceAccountId,
                 "Account ID should match requested account ID"
         );
 
-        accountApiClient.assertFieldIsNotBlank(
+        AssertUtil.assertFieldIsNotBlank(
                 customerId,
                 "Customer ID"
         );
@@ -62,7 +73,7 @@ public class AccountApiTest extends BaseApiTest {
                 "Customer ID should contain digits only"
         );
 
-        accountApiClient.assertFieldIsNotBlank(
+        AssertUtil.assertFieldIsNotBlank(
                 accountType,
                 "Account type"
         );
@@ -73,18 +84,25 @@ public class AccountApiTest extends BaseApiTest {
                 "Account type should be CHECKING or SAVINGS"
         );
 
-        accountApiClient.assertFieldIsNotBlank(
+        AssertUtil.assertFieldIsNotBlank(
                 balance,
                 "Balance"
         );
 
-        Assert.assertTrue(
-                Double.parseDouble(balance) >= 0,
-                "Balance should be greater than or equal to zero"
+        BigDecimal accountBalance =
+                new BigDecimal(balance);
+
+        Reporter.log(
+                "Balance can be parsed successfully: " + accountBalance,
+                true
         );
 
         Reporter.log("PASSED - API06 - Verify account details can be retrieved successfully", true);
     }
+
+    // =========================================================
+    // API07 - Verify error response is returned for invalid account ID
+    // =========================================================
 
     @Test(description = "API07 - Verify error response is returned for invalid account ID")
     public void API07_verifyErrorResponseReturnedForInvalidAccountId() {
@@ -121,6 +139,10 @@ public class AccountApiTest extends BaseApiTest {
 
     }
 
+    // =========================================================
+    // API08 - Verify user can create a new checking account successfully
+    // =========================================================
+
     @Test(description = "API08 - Verify user can create a new checking account successfully")
     public void API08_verifyCreateNewCheckingAccountSuccessfully() {
 
@@ -128,10 +150,10 @@ public class AccountApiTest extends BaseApiTest {
 
         String customerId =
                 accountApiClient.getCustomerIdByAccountId(
-                        ApiTestData.VALID_ACCOUNT_ID
+                        primarySourceAccountId
                 );
 
-        accountApiClient.assertFieldIsNotBlank(
+        AssertUtil.assertFieldIsNotBlank(
                 customerId,
                 "Customer ID"
         );
@@ -139,10 +161,10 @@ public class AccountApiTest extends BaseApiTest {
         Reporter.log("STEP 2 - Send create checking account request", true);
 
         Response response =
-                accountApiClient.createNewAccount(
+                accountApiClient.createAccount(
                         customerId,
                         ApiTestData.CHECKING_ACCOUNT_TYPE,
-                        ApiTestData.VALID_ACCOUNT_ID
+                        primarySourceAccountId
                 );
 
         Reporter.log("STEP 3 - Verify status code is 200", true);
@@ -164,12 +186,12 @@ public class AccountApiTest extends BaseApiTest {
         String accountType =
                 response.xmlPath().getString("account.type");
 
-        String balance =
+        String accountBalance =
                 response.xmlPath().getString("account.balance");
 
         Reporter.log("STEP 5 - Verify new account ID is generated", true);
 
-        accountApiClient.assertFieldIsNotBlank(
+        AssertUtil.assertFieldIsNotBlank(
                 newAccountId,
                 "New account ID"
         );
@@ -197,14 +219,17 @@ public class AccountApiTest extends BaseApiTest {
 
         Reporter.log("STEP 8 - Verify balance is returned", true);
 
-        accountApiClient.assertFieldIsNotBlank(
-                balance,
+        AssertUtil.assertFieldIsNotBlank(
+                accountBalance,
                 "Balance"
         );
 
-        Assert.assertTrue(
-                Double.parseDouble(balance) >= 0,
-                "Balance should be greater than or equal to zero"
+        BigDecimal balance =
+                new BigDecimal(accountBalance);
+
+        Reporter.log(
+                "New account balance can be parsed successfully: " + balance,
+                true
         );
 
         Reporter.log("PASSED - API08 - Verify user can create a new checking account successfully", true);

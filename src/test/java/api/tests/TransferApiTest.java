@@ -13,6 +13,8 @@ import utils.ConfigReader;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static utils.AssertUtil.assertFieldIsNotBlank;
+
 public class TransferApiTest extends BaseApiTest {
 
     private final AccountApiClient accountApiClient =
@@ -30,12 +32,18 @@ public class TransferApiTest extends BaseApiTest {
     private final LoginApiClient loginApiClient =
             new LoginApiClient();
 
-    private final String username2 =
-            ConfigReader.getProperty("username2");
+    private final String secondaryUsername =
+            ConfigReader.getProperty("secondaryUsername");
 
-    private final String password2 =
-            ConfigReader.getProperty("password2");
+    private final String secondaryPassword =
+            ConfigReader.getProperty("secondaryPassword");
 
+    private final String primarySourceAccountId =
+            ConfigReader.getProperty("primarySourceAccountId");
+
+    // =========================================================
+    // API09 - Verify funds can be transferred successfully and balances are updated correctly
+    // =========================================================
 
     @Test(description = "API09 - Verify funds can be transferred successfully and balances are updated correctly")
     public void API09_verifyTransferFundsSuccessfullyAndBalancesUpdatedCorrectly() {
@@ -43,9 +51,15 @@ public class TransferApiTest extends BaseApiTest {
         Reporter.log("STEP 1 - Create destination checking account", true);
 
         String destinationAccountId =
-                accountApiClient.createNewCheckingAccount(
-                        ApiTestData.VALID_ACCOUNT_ID
+                accountApiClient.createNewAccount(
+                        primarySourceAccountId,
+                        ApiTestData.CHECKING_ACCOUNT_TYPE
                 );
+
+        assertFieldIsNotBlank(
+                destinationAccountId,
+                "New account ID"
+        );
 
         Reporter.log("destinationAccountId: " + destinationAccountId, true);
 
@@ -53,7 +67,7 @@ public class TransferApiTest extends BaseApiTest {
 
         BigDecimal sourceBalanceBefore =
                 accountApiClient.getAccountBalance(
-                        ApiTestData.VALID_ACCOUNT_ID
+                        primarySourceAccountId
                 );
 
         BigDecimal destinationBalanceBefore =
@@ -61,16 +75,16 @@ public class TransferApiTest extends BaseApiTest {
                         destinationAccountId
                 );
 
-        Reporter.log("STEP 4 - Transfer funds", true);
+        Reporter.log("STEP 3 - Transfer funds", true);
 
         Response transferResponse =
                 transferApiClient.transferFunds(
-                        ApiTestData.VALID_ACCOUNT_ID,
+                        primarySourceAccountId,
                         destinationAccountId,
-                        ApiTestData.TRANSFER_AMOUNT
+                        ApiTestData.VALID_TRANSFER_AMOUNT
                 );
 
-        Reporter.log("STEP 5 - Verify transfer response status code", true);
+        Reporter.log("STEP 4 - Verify transfer response status code", true);
 
         Assert.assertEquals(
                 transferResponse.statusCode(),
@@ -78,11 +92,11 @@ public class TransferApiTest extends BaseApiTest {
                 "Transfer API status code should be 200"
         );
 
-        Reporter.log("STEP 6 - Get balances after transfer", true);
+        Reporter.log("STEP 5 - Get balances after transfer", true);
 
         BigDecimal sourceBalanceAfter =
                 accountApiClient.getAccountBalance(
-                        ApiTestData.VALID_ACCOUNT_ID
+                        primarySourceAccountId
                 );
 
         BigDecimal destinationBalanceAfter =
@@ -90,10 +104,10 @@ public class TransferApiTest extends BaseApiTest {
                         destinationAccountId
                 );
 
-        BigDecimal transferAmount =
-                new BigDecimal(ApiTestData.TRANSFER_AMOUNT);
+        Reporter.log("STEP 6 - Verify source balance decreased", true);
 
-        Reporter.log("STEP 7 - Verify source balance decreased", true);
+        BigDecimal transferAmount =
+                new BigDecimal(ApiTestData.VALID_TRANSFER_AMOUNT);
 
         BigDecimal expectedSourceBalance =
                 sourceBalanceBefore.subtract(
@@ -108,7 +122,7 @@ public class TransferApiTest extends BaseApiTest {
                 "Source balance should decrease by transfer amount"
         );
 
-        Reporter.log("STEP 8 - Verify destination balance increased", true);
+        Reporter.log("STEP 7 - Verify destination balance increased", true);
 
         BigDecimal expectedDestinationBalance =
                 destinationBalanceBefore.add(
@@ -126,6 +140,11 @@ public class TransferApiTest extends BaseApiTest {
         Reporter.log("PASSED - API09 - Verify funds can be transferred successfully and balances are updated correctly", true);
     }
 
+
+
+    // =========================================================
+    // API12 - Verify transfer request is rejected when source and destination accounts are the same
+    // =========================================================
     /**
      * Disabled because ParaBank demo API does not reject same source and destination account as expected.
      */
@@ -136,9 +155,9 @@ public class TransferApiTest extends BaseApiTest {
 
         Response transferResponse =
                 transferApiClient.transferFunds(
-                        ApiTestData.VALID_ACCOUNT_ID,
-                        ApiTestData.VALID_ACCOUNT_ID,
-                        ApiTestData.TRANSFER_AMOUNT
+                        primarySourceAccountId,
+                        primarySourceAccountId,
+                        ApiTestData.VALID_TRANSFER_AMOUNT
                 );
 
         Reporter.log("STEP 2 - Verify transfer response status code is 400", true);
@@ -163,6 +182,9 @@ public class TransferApiTest extends BaseApiTest {
         Reporter.log("PASSED - API12 - Verify transfer request is rejected when source and destination accounts are the same", true);
     }
 
+    // =========================================================
+    // API15 - Verify transfer request is rejected when transfer amount equals zero
+    // =========================================================
     /**
      * Disabled because ParaBank demo API accepts transfer amount equals zero
      * instead of rejecting it.
@@ -172,17 +194,23 @@ public class TransferApiTest extends BaseApiTest {
 
         Reporter.log("STEP 1 - Create destination checking account", true);
         String destinationAccountId =
-                accountApiClient.createNewCheckingAccount(
-                        ApiTestData.VALID_ACCOUNT_ID
+                accountApiClient.createNewAccount(
+                        primarySourceAccountId,
+                        ApiTestData.CHECKING_ACCOUNT_TYPE
                 );
+
+        assertFieldIsNotBlank(
+                destinationAccountId,
+                "New account ID"
+        );
 
         Reporter.log("STEP 2 - Attempt to transfer zero amount from source account to destination account", true);
 
         Response transferResponse =
                 transferApiClient.transferFunds(
-                        ApiTestData.VALID_ACCOUNT_ID,
+                        primarySourceAccountId,
                         destinationAccountId,
-                        "0"
+                        ApiTestData.ZERO_AMOUNT
                 );
 
         Reporter.log("STEP 3 - Verify transfer response status code is 400", true);
@@ -207,6 +235,9 @@ public class TransferApiTest extends BaseApiTest {
         Reporter.log("PASSED - API15 - Verify transfer request is rejected when transfer amount equals zero", true);
     }
 
+    // =========================================================
+    // API14 - Verify transfer request is rejected when transfer amount is negative
+    // =========================================================
     /**
      * Disabled because ParaBank demo API accepts transfer amount is negative
      * instead of rejecting it.
@@ -216,17 +247,23 @@ public class TransferApiTest extends BaseApiTest {
 
         Reporter.log("STEP 1 - Create destination checking account", true);
         String destinationAccountId =
-                accountApiClient.createNewCheckingAccount(
-                        ApiTestData.VALID_ACCOUNT_ID
+                accountApiClient.createNewAccount(
+                        primarySourceAccountId,
+                        ApiTestData.CHECKING_ACCOUNT_TYPE
                 );
+
+        assertFieldIsNotBlank(
+                destinationAccountId,
+                "New account ID"
+        );
 
         Reporter.log("STEP 2 - Attempt to transfer negative amount from source account to destination account", true);
 
         Response transferResponse =
                 transferApiClient.transferFunds(
-                        ApiTestData.VALID_ACCOUNT_ID,
+                        primarySourceAccountId,
                         destinationAccountId,
-                        "-100"
+                        ApiTestData.NEGATIVE_AMOUNT
                 );
 
         Reporter.log("STEP 3 - Verify transfer response status code is 400", true);
@@ -251,9 +288,12 @@ public class TransferApiTest extends BaseApiTest {
         Reporter.log("PASSED - API14 - Verify transfer request is rejected when transfer amount is negative", true);
     }
 
+    // =========================================================
+    // API13 - Verify transfer request is rejected when transfer amount exceeds available balance
+    // =========================================================
     /**
-     * Disabled because ParaBank demo API accepts transfer amount exceeds available balance
-     * instead of rejecting it.
+     * Disabled because ParaBank demo does not enforce this banking validation.
+     * In a real banking system, this scenario should be rejected.
      */
     @Test(description = "API13 - Verify transfer request is rejected when transfer amount exceeds available balance", enabled = false)
     public void API13_verifyTransferRequestIsRejectedWhenAmountExceedsAvailableBalance() {
@@ -261,14 +301,20 @@ public class TransferApiTest extends BaseApiTest {
         Reporter.log("STEP 1 - Get source account balance", true);
         BigDecimal sourceBalanceBefore =
                 accountApiClient.getAccountBalance(
-                        ApiTestData.VALID_ACCOUNT_ID
+                        primarySourceAccountId
                 );
 
         Reporter.log("STEP 2 - Create destination checking account", true);
         String destinationAccountId =
-                accountApiClient.createNewCheckingAccount(
-                        ApiTestData.VALID_ACCOUNT_ID
+                accountApiClient.createNewAccount(
+                        primarySourceAccountId,
+                        ApiTestData.CHECKING_ACCOUNT_TYPE
                 );
+
+        assertFieldIsNotBlank(
+                destinationAccountId,
+                "New account ID"
+        );
 
         Reporter.log("STEP 3 - Attempt to transfer amount greater than available balance from source account to destination account", true);
 
@@ -279,7 +325,7 @@ public class TransferApiTest extends BaseApiTest {
 
         Response transferResponse =
                 transferApiClient.transferFunds(
-                        ApiTestData.VALID_ACCOUNT_ID,
+                        primarySourceAccountId,
                         destinationAccountId,
                         transferAmount.toPlainString()
                 );
@@ -306,14 +352,24 @@ public class TransferApiTest extends BaseApiTest {
         Reporter.log("PASSED - API13 - Verify transfer request is rejected when transfer amount exceeds available balance", true);
     }
 
+    // =========================================================
+    // API10 - Verify transfer transaction is recorded in transaction history with correct details
+    // =========================================================
+
     @Test(description = "API10 - Verify transfer transaction is recorded in transaction history with correct details")
     public void API10_verifyTransferTransactionIsRecordedInTransactionHistoryWithCorrectDetails() {
 
         Reporter.log("STEP 1 - Create destination checking account", true);
         String destinationAccountId =
-                accountApiClient.createNewCheckingAccount(
-                        ApiTestData.VALID_ACCOUNT_ID
+                accountApiClient.createNewAccount(
+                        primarySourceAccountId,
+                        ApiTestData.CHECKING_ACCOUNT_TYPE
                 );
+
+        assertFieldIsNotBlank(
+                destinationAccountId,
+                "New account ID"
+        );
 
         Reporter.log("STEP 2 - Get destination transaction IDs before transfer", true);
 
@@ -342,9 +398,9 @@ public class TransferApiTest extends BaseApiTest {
 
         Response transferResponse =
                 transferApiClient.transferFunds(
-                        ApiTestData.VALID_ACCOUNT_ID,
+                        primarySourceAccountId,
                         destinationAccountId,
-                        ApiTestData.TRANSFER_AMOUNT
+                        ApiTestData.VALID_TRANSFER_AMOUNT
                 );
 
         Assert.assertEquals(
@@ -358,8 +414,8 @@ public class TransferApiTest extends BaseApiTest {
 
         Assert.assertTrue(
                 bodyMessage.contains(
-                        "Successfully transferred $" +  ApiTestData.TRANSFER_AMOUNT + " from account #"
-                                + ApiTestData.VALID_ACCOUNT_ID + " to account #" + destinationAccountId
+                        "Successfully transferred $" +  ApiTestData.VALID_TRANSFER_AMOUNT + " from account #"
+                                + primarySourceAccountId + " to account #" + destinationAccountId
                 ),
                 "Response body should show successful transfer message with correct details"
         );
@@ -445,13 +501,13 @@ public class TransferApiTest extends BaseApiTest {
 
         Assert.assertEquals(
                 newTransactionType,
-                "Credit",
+                ApiTestData.CREDIT_TRANSACTION_TYPE,
                 "New transaction type should be Credit for destination account"
         );
 
         BigDecimal expectedAmount =
                 new BigDecimal(
-                        ApiTestData.TRANSFER_AMOUNT
+                        ApiTestData.VALID_TRANSFER_AMOUNT
                 );
 
         BigDecimal actualAmount =
@@ -467,7 +523,7 @@ public class TransferApiTest extends BaseApiTest {
 
         Assert.assertEquals(
                 newTransactionDescription,
-                "Funds Transfer Received",
+                ApiTestData.RECEIVED_TRANSACTION,
                 "New transaction description should indicate funds received"
         );
 
@@ -478,14 +534,18 @@ public class TransferApiTest extends BaseApiTest {
 
     }
 
+    // =========================================================
+    // API11 - Verify transfer request is successful between accounts of different customers
+    // =========================================================
+
     @Test(description = "API11 - Verify transfer request is successful between accounts of different customers")
     public void API11_verifyTransferRequestIsSuccessfulBetweenAccountsOfDifferentCustomers(){
 
         Reporter.log("STEP 1 - Get destination customer id and checking account for destination", true);
         String destinationCustomerId =
                 loginApiClient.getCustomerId(
-                        username2,
-                        password2
+                        secondaryUsername,
+                        secondaryPassword
                 );
 
         Assert.assertNotNull(
@@ -526,17 +586,15 @@ public class TransferApiTest extends BaseApiTest {
 
         List<String> transactionIdsBefore = xmlPathBefore.getList("transactions.transaction.id");
 
-        int transactionCountBefore = transactionIdsBefore.size();
-
         Reporter.log("Transaction IDs in destination account before transfer: " + transactionIdsBefore, true);
 
         Reporter.log("STEP 4 - Transfer funds from source account to destination account of different customer", true);
 
         Response transferResponse =
                 transferApiClient.transferFunds(
-                        ApiTestData.VALID_ACCOUNT_ID,
+                        primarySourceAccountId,
                         destinationAccountId,
-                        ApiTestData.TRANSFER_AMOUNT
+                        ApiTestData.VALID_TRANSFER_AMOUNT
                 );
 
         Assert.assertEquals(
@@ -599,12 +657,12 @@ public class TransferApiTest extends BaseApiTest {
 
         Assert.assertEquals(
                 newTransactionType,
-                "Credit",
+                ApiTestData.CREDIT_TRANSACTION_TYPE,
                 "Most recent transaction type should be 'Transfer'"
         );
 
         BigDecimal expectedAmount =
-                new BigDecimal(ApiTestData.TRANSFER_AMOUNT);
+                new BigDecimal(ApiTestData.VALID_TRANSFER_AMOUNT);
 
         BigDecimal actualAmount =
                 new BigDecimal(newTransactionAmount);
@@ -617,7 +675,7 @@ public class TransferApiTest extends BaseApiTest {
 
         Assert.assertEquals(
                 newTransactionDescription,
-                "Funds Transfer Received",
+                ApiTestData.RECEIVED_TRANSACTION,
                 "New transaction description should indicate funds received"
         );
 

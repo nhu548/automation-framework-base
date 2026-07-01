@@ -1,6 +1,7 @@
-package tests;
+package ui.tests;
 
-import base.BaseTest;
+import ui.testdata.UITestData;
+import ui.base.BaseTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -25,20 +26,20 @@ public class LoginTest extends BaseTest {
     private DashboardPage loginWithValidCredentials() {
 
         String username =
-                ConfigReader.getProperty("username1");
+                ConfigReader.getProperty("primaryUsername");
 
         String password =
-                ConfigReader.getProperty("password1");
+                ConfigReader.getProperty("primaryPassword");
 
         return loginPage.login(username, password);
     }
 
     // =========================================================
-    // TC01 - Verify login page title displayed correctly
+    // UI01 - Verify Login Page Title Is Displayed Correctly
     // =========================================================
 
-    @Test(description = "Verify login page title is displayed correctly")
-    public void verifyLoginPageTitle() {
+    @Test(description = "UI01 - Verify login page title is displayed correctly")
+    public void UI01_verifyLoginPageTitleIsDisplayedCorrectly() {
 
         String actualTitle = driver.getTitle();
 
@@ -47,15 +48,15 @@ public class LoginTest extends BaseTest {
                 "Login page title is incorrect"
         );
 
-        test.pass("Login page title verified successfully");
+        test.pass("PASSED - UI01 - Verify login page title is displayed correctly");
     }
 
     // =========================================================
-    // TC02 - Verify successful login with valid credentials
+    // UI02 - Verify User Can Login With Valid Credentials
     // =========================================================
 
-    @Test(description = "Verify user can login successfully with valid credentials")
-    public void verifyLoginWithValidCredentials() {
+    @Test(description = "UI02 - Verify user can login with valid credentials")
+    public void UI02_verifyUserCanLoginWithValidCredentials() {
 
         DashboardPage dashboardPage =
                 loginWithValidCredentials();
@@ -69,19 +70,19 @@ public class LoginTest extends BaseTest {
                 "Dashboard header is incorrect after login"
         );
 
-        test.pass("User logged in successfully");
+        test.pass("PASSED - UI02 - Verify user can login with valid credentials");
     }
 
     // =========================================================
-    // TC03 - Verify login with invalid credentials
+    // UI03 - Verify Error Message Is Displayed For Invalid Credentials
     // =========================================================
 
-    @Test(description = "Verify error message displayed for invalid login")
-    public void verifyLoginWithInvalidCredentials() {
+    @Test(description = "UI03 - Verify error message is displayed for invalid credentials")
+    public void UI03_verifyErrorMessageIsDisplayedForInvalidCredentials() {
 
         loginPage.login(
-                "invalidUser",
-                "invalidPassword"
+                UITestData.INVALID_USERNAME,
+                UITestData.INVALID_PASSWORD
         );
 
         String actualErrorMessage =
@@ -98,15 +99,15 @@ public class LoginTest extends BaseTest {
                 "Unexpected error message displayed"
         );
 
-        test.pass("Proper error message displayed for invalid login");
+        test.pass("PASSED - UI03 - Verify error message is displayed for invalid credentials");
     }
 
     // =========================================================
-    // TC04 - Verify successful logout
+    // UI04 - Verify User Can Logout Successfully
     // =========================================================
 
-    @Test(description = "Verify user can logout successfully")
-    public void verifySuccessfulLogout() {
+    @Test(description = "UI04 - Verify user can logout successfully")
+    public void UI04_verifyUserCanLogoutSuccessfully() {
 
         DashboardPage dashboardPage =
                 loginWithValidCredentials();
@@ -121,6 +122,6 @@ public class LoginTest extends BaseTest {
                 "Login page should be displayed after logout"
         );
 
-        test.pass("Logout functionality verified successfully");
+        test.pass("PASSED - UI04 - Verify user can logout successfully");
     }
 }
