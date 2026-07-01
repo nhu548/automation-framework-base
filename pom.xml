@@ -43,7 +43,7 @@
                     <suiteXmlFiles>
 
                         <suiteXmlFile>
-                            src/test/resources/testng-dynamic-regression-suite.xml
+                            src/test/resources/testng-regression-dynamic-suite.xml
                         </suiteXmlFile>
 
                     </suiteXmlFiles>
