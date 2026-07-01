@@ -7,15 +7,15 @@
 
         <classes>
 
-            <class name="tests.LoginTest"/>
+            <class name="ui.tests.LoginTest"/>
 
-            <class name="tests.AccountsOverviewTest"/>
+            <class name="ui.tests.AccountsOverviewTest"/>
 
-            <class name="tests.AccountDetailsTest"/>
+            <class name="ui.tests.AccountDetailsTest"/>
 
-            <class name="tests.EndToEndBankingTest"/>
+            <class name="ui.tests.EndToEndBankingTest"/>
 
-            <class name="tests.TransferFundsTest">
+            <class name="ui.tests.TransferFundsTest">
                 <methods>
                     <exclude name="verifyTransferRejectedWhenAmountIsZero"/>
                     <exclude name="verifyTransferRejectedDueToInsufficientBalance"/>

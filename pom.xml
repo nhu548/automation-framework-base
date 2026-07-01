@@ -43,7 +43,7 @@
                     <suiteXmlFiles>
 
                         <suiteXmlFile>
-                            src/test/resources/testng-bank-suite.xml
+                            src/test/resources/testng-dynamic-regression-suite.xml
                         </suiteXmlFile>
 
                     </suiteXmlFiles>
@@ -57,8 +57,8 @@
     </build>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -85,14 +85,6 @@
             <version>5.8.0</version>
         </dependency>
 
-        <!-- REST Assured -->
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>5.4.0</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -109,6 +101,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.16</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>5.5.0</version>
         </dependency>
 
     </dependencies>

@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="Bank Hybrid UI API Test Suite">
+    <test name="Hybrid Tests">
+        <classes>
+            <class name="hybrid.tests.HybridBankingE2ETest"/>
+        </classes>
+    </test>
+</suite>
